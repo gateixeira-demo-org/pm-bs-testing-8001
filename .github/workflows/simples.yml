@@ -23,25 +23,25 @@ jobs:
       contents: read
       
     steps:
-    - uses: actions/checkout@v3
-      with:
-        show-progress: false
-    - name: Generate SSH key
-      run: |
-        eval `ssh-agent -s`
-        ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa <<<y >/dev/null 2>&1
-    - name: Set up Ruby 2.7
-      uses: ruby/setup-ruby@v1
+    # - uses: actions/checkout@v3
+    #   with:
+    #     show-progress: false
+    # - name: Generate SSH key
+    #   run: |
+    #     eval `ssh-agent -s`
+    #     ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa <<<y >/dev/null 2>&1
+    # - name: Set up Ruby 2.7
+    #   uses: ruby/setup-ruby@v1
   
     - name: Build + Launch GHES with qaboot
       id: run_qaboot
       env:
         QABOOT_USER: ${{ env.USER }}
-        QABOOT_GITHUB_TOKEN: ${{ secrets.QABOOT_GITHUB_TOKEN }}
-        QABOOT_AWS_ACCESS_KEY_ID: ${{ secrets.QABOOT_AWS_ACCESS_KEY_ID }}
-        QABOOT_AWS_SECRET_ACCESS_KEY: ${{ secrets.QABOOT_AWS_SECRET_ACCESS_KEY }}
-        QABOOT_ROUTE53_ACCESS_KEY_ID: ${{ secrets.QABOOT_AWS_ACCESS_KEY_ID }}
-        QABOOT_ROUTE53_SECRET_ACCESS_KEY: ${{ secrets.QABOOT_AWS_SECRET_ACCESS_KEY }} 
+        # QABOOT_GITHUB_TOKEN: ${{ secrets.QABOOT_GITHUB_TOKEN }}
+        # QABOOT_AWS_ACCESS_KEY_ID: ${{ secrets.QABOOT_AWS_ACCESS_KEY_ID }}
+        # QABOOT_AWS_SECRET_ACCESS_KEY: ${{ secrets.QABOOT_AWS_SECRET_ACCESS_KEY }}
+        # QABOOT_ROUTE53_ACCESS_KEY_ID: ${{ secrets.QABOOT_AWS_ACCESS_KEY_ID }}
+        # QABOOT_ROUTE53_SECRET_ACCESS_KEY: ${{ secrets.QABOOT_AWS_SECRET_ACCESS_KEY }} 
       run: |
         # gem install bundler
         # bundle install --local --jobs 8 --retry 3
@@ -57,7 +57,7 @@ jobs:
         
   run-tests:
     needs: [setup]
-    runs-on: ubuntu-latest-xl
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/github/ghe-tester:latest
       env:
