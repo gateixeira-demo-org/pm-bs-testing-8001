@@ -1,21 +1,12 @@
 name: Sanity Tests
 
 on:
-# pull_request:
-# push:
-#   branches:
-#     - master
  workflow_dispatch:
-
-env:
-  USER: qaboot
-  GHES_VERSION: 3.9
-  GHES_PLATFORM: aws
-  GHES_REGION: us-west-1
-
+ 
 jobs:
   setup:
     runs-on: ubuntu-latest
+    
     outputs:
       qaboot_hostname: ${{ steps.run_qaboot.outputs.qaboot_hostname }}
       
@@ -23,16 +14,6 @@ jobs:
       contents: read
       
     steps:
-    # - uses: actions/checkout@v3
-    #   with:
-    #     show-progress: false
-    # - name: Generate SSH key
-    #   run: |
-    #     eval `ssh-agent -s`
-    #     ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa <<<y >/dev/null 2>&1
-    # - name: Set up Ruby 2.7
-    #   uses: ruby/setup-ruby@v1
-  
     - name: Build + Launch GHES with qaboot
       id: run_qaboot
       env:
@@ -59,32 +40,15 @@ jobs:
     needs: [setup]
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/github/ghe-tester:latest
+      image: ubuntu:latest
       env:
         QABOOT_HOSTNAME: ${{ needs.setup.outputs.qaboot_hostname }}
         BAR: ${{ env.FOOBAR }}
     env:
       QABOOT_HOSTNAME: ${{ needs.setup.outputs.qaboot_hostname }}
       FOOBAR: "yes it is foobar"
+      
     steps:
     - name: Print ENV
       run: env
-    - name: Run Sanity Tests
-      run: |
-        env
-        MAX_TRIES=60
-        SLEEP_TIME=5
-        for i in $(seq 1 $MAX_TRIES); do
-          if ssh -o BatchMode=yes -p 122 "admin@$QABOOT_HOSTNAME" true; then
-              echo "$QABOOT_HOSTNAME resolved successfully"
-              DOTCOM_LOGIN=$USER DOTCOM_PASSWORD="${{ secrets.DOTCOM_PASSWORD }}" script/sanity-tests $QABOOT_HOSTNAME
-              echo "true"
-              exit 0
-            else
-              echo "$QABOOT_HOSTNAME not resolved yet, retrying in $SLEEP_TIME seconds"
-              sleep $SLEEP_TIME
-           fi
-        done
-        echo "Error: $QABOOT_HOSTNAME did not resolve after $((MAX_TRIES * SLEEP_TIME)) seconds"
-
         
